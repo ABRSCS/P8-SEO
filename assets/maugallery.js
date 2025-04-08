@@ -14,11 +14,9 @@
         $.fn.mauGallery.listeners(options);
   
         $(this)
-          .children(".gallery-item")
+          .find(".gallery-item")
           .each(function(index) {
             $.fn.mauGallery.methods.responsiveImageItem($(this));
-            $.fn.mauGallery.methods.moveItemInRowWrapper($(this));
-            $.fn.mauGallery.methods.wrapItemInColumn($(this), options.columns);
             var theTag = $(this).data("gallery-tag");
             if (
               options.showTags &&
@@ -69,9 +67,8 @@
       createRowWrapper(element) {
         if (
           !element
-            .children()
-            .first()
-            .hasClass("row")
+            .find(".gallery-items-row")
+            .length
         ) {
           element.append('<div class="gallery-items-row row"></div>');
         }

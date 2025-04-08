@@ -1,10 +1,3 @@
-# Désactiver les WebSockets
-<IfModule mod_rewrite.c>
-  RewriteEngine On
-  RewriteCond %{HTTP:Upgrade} =websocket [NC]
-  RewriteRule ^(.*)$ - [F,L]
-</IfModule>
-
 # Configuration du cache pour permettre le bfcache
 <IfModule mod_headers.c>
   # Désactiver le cache pour les pages HTML
@@ -20,9 +13,32 @@
   </FilesMatch>
 </IfModule>
 
-# Compression GZIP
+# Compression Brotli
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml application/xhtml+xml application/rss+xml application/atom+xml application/x-font-ttf application/x-font-opentype image/svg+xml application/x-font-woff application/font-woff2
+  BrotliCompressionLevel 6
+  BrotliWindowSize 17
+  BrotliMinFileSize 20
+</IfModule>
+
+# Compression GZIP (fallback si Brotli n'est pas disponible)
 <IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json
+  # Active la compression
+  SetOutputFilter DEFLATE
+  
+  # Niveau de compression
+  DeflateCompressionLevel 6
+  
+  # Types de fichiers à compresser
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml application/xhtml+xml application/rss+xml application/atom+xml application/x-font-ttf application/x-font-opentype image/svg+xml application/x-font-woff application/font-woff2
+  
+  # Exclure les navigateurs qui ne supportent pas la compression
+  BrowserMatch ^Mozilla/4 gzip-only-text/html
+  BrowserMatch ^Mozilla/4\.0[678] no-gzip
+  BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+  
+  # Taille minimale pour la compression
+  SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png)$ no-gzip dont-vary
 </IfModule>
 
 # Protection contre les attaques XSS et autres
@@ -50,11 +66,10 @@
   ExpiresByType text/javascript "access plus 1 month"
   ExpiresByType application/javascript "access plus 1 month"
   
-  # Fonts
-  ExpiresByType font/ttf "access plus 1 year"
-  ExpiresByType font/otf "access plus 1 year"
-  ExpiresByType font/woff "access plus 1 year"
-  ExpiresByType font/woff2 "access plus 1 year"
+  # Polices
   ExpiresByType application/font-woff "access plus 1 year"
   ExpiresByType application/font-woff2 "access plus 1 year"
+  ExpiresByType application/x-font-ttf "access plus 1 year"
+  ExpiresByType application/x-font-opentype "access plus 1 year"
+  ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
 </IfModule> 
