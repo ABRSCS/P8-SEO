@@ -1,3 +1,8 @@
+# Test si .htaccess est lu
+<IfModule mod_headers.c>
+  Header set X-Test-Htaccess "Active"
+</IfModule>
+
 # Configuration du cache pour permettre le bfcache
 <IfModule mod_headers.c>
   # Désactiver le cache pour les pages HTML
